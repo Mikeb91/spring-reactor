@@ -1,12 +1,14 @@
 package com.mitocode.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
+@JsonInclude(Include.NON_NULL) //Anotación para evitar que se muestre el null en consultas a DB en campos que no existen.
 @Document(collection = "clientes")
 public class Cliente {
   @Id
@@ -18,7 +20,7 @@ public class Cliente {
   @NotNull
   @Size(min = 3)
   @Field(name = "apellidos")
-  private String appelidos;
+  private String apellidos;
   @NotNull
   @Field(name = "fechaNac")
   private LocalDate fechaNac;
@@ -41,12 +43,12 @@ public class Cliente {
     this.nombres = nombres;
   }
 
-  public String getAppelidos() {
-    return appelidos;
+  public String getApellidos() {
+    return apellidos;
   }
 
-  public void setAppelidos(String appelidos) {
-    this.appelidos = appelidos;
+  public void setApellidos(String apellidos) {
+    this.apellidos = apellidos;
   }
 
   public LocalDate getFechaNac() {
