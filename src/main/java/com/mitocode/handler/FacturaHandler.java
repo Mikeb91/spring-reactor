@@ -4,6 +4,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
 import com.mitocode.model.Factura;
 import com.mitocode.service.IFacturaService;
+import com.mitocode.validators.RequestValidators;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,6 +18,8 @@ public class FacturaHandler {
 
   @Autowired
   private IFacturaService service;
+  @Autowired
+  private RequestValidators validadorGeneral;
 
   public Mono<ServerResponse> listar(ServerRequest req) {
     return ServerResponse
@@ -40,6 +43,7 @@ public class FacturaHandler {
     Mono<Factura> monoFactura = req.bodyToMono(
         Factura.class); //Forma de recuperar el body directamente en instancia de Mono<Factura>
     return monoFactura
+        .flatMap(validadorGeneral::validate)
         .flatMap(p -> service.registrar(p))
         .flatMap(p -> ServerResponse.created(URI.create(req.uri().toString().concat(p.getId())))
             .contentType(MediaType.APPLICATION_JSON)
@@ -60,6 +64,7 @@ public class FacturaHandler {
           bd.setItems(f.getItems());
           return bd;
         })
+        .flatMap(validadorGeneral::validate)
         .flatMap(service::modificar)
         .flatMap(p -> ServerResponse.ok()
             .contentType(MediaType.APPLICATION_JSON)
