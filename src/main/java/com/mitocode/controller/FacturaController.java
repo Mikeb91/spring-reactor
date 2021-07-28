@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.met
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.mitocode.dto.FiltroDTO;
 import com.mitocode.model.Factura;
 import com.mitocode.pagination.PageSupport;
 import com.mitocode.service.IFacturaService;
@@ -150,6 +151,26 @@ public class FacturaController {
             .body(p)
         )
         .defaultIfEmpty(ResponseEntity.noContent().build());
+  }
+
+  @PostMapping("/buscar")
+  public Mono<ResponseEntity<Flux<Factura>>> buscar(@RequestBody FiltroDTO filtro){
+    Flux<Factura> fxFacturas =  service.obtenerFacturasPorFiltro(filtro);
+    return Mono.just(ResponseEntity.ok()
+    .contentType(MediaType.APPLICATION_JSON)
+    .body(fxFacturas));
+  }
+
+  @GetMapping("/generarReporte/{id}")
+  public Mono<ResponseEntity<byte[]>> generarReporte(@PathVariable("id") String id){
+
+    Mono<byte[]> monoReporte = service.generarReporte(id);
+
+    return monoReporte
+        .map(bytes -> ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_OCTET_STREAM) //Est tipo de datos representa arreglo de bytes en este caso PDF
+            .body(bytes)
+        ).defaultIfEmpty(new ResponseEntity<byte[]>(HttpStatus.NO_CONTENT));
   }
 
 }
